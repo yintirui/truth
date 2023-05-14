@@ -1,4 +1,19 @@
 # Created by .ignore support plugin (hsz.mobi)
+
+# log
+*.log*
+logs/*
+
+# data
+data/*
+data.zip
+
+# archive
+archive/
+
+# vscode
+.vscode/
+
 ### Python template
 # Byte-compiled / optimized / DLL files
 __pycache__/

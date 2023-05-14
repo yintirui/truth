@@ -16,6 +16,8 @@ class Classifier(nn.Module):
         self.dropout = args.dropout
         self.n_units = args.n_units
         self.n_class = args.n_class
+        print(args.n_units)
+        print(args.n_class)
 
         self.backbone = models.vgg16_bn(pretrained=True)
         self.backbone.classifier = nn.Sequential(

@@ -45,4 +45,4 @@ if __name__ == "__main__":
             pred = torch.argmax(pred, dim=1)
             correct += torch.sum(torch.eq(pred, y)).item()
 
-        print(f'Test Accuracy: {correct / len(test_dataset)}')
+        print(f'Accuracy: {correct / len(test_dataset)}')

@@ -75,10 +75,11 @@ if __name__ == "__main__":
             # Move the parameters to device given by argument
             x, y, annotation, annotator = x.to(args.device), y.to(args.device), annotation.to(args.device), annotator.to(args.device)
             ann_out, cls_out = model(x, annotator)
+            # print(ann_out, cls_out)
 
             # Calculate loss of annotators' labeling
             ann_out = torch.reshape(ann_out, (-1, args.n_class))
-            annotation = annotation.view(-1)
+            annotation = annotation.view(-1)# [:ann_out.shape[0]]
             loss = criterion(ann_out, annotation)
 
             # Regularization term
@@ -94,6 +95,7 @@ if __name__ == "__main__":
 
             # Calculate classifier accuracy
             pred = torch.argmax(cls_out, dim=1)
+            # print(pred)
             train_correct += torch.sum(torch.eq(pred, y)).item()
 
         # Validation

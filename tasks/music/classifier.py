@@ -9,6 +9,16 @@ def add_classifier_args(parser):
                        help="Number of units in FC layer (Default: 128).")
 
 
+class PrintLayer(nn.Module):
+    def __init__(self):
+        super(PrintLayer, self).__init__()
+
+    def forward(self, x):
+        # Do your print / debug stuff here
+        print(x)
+        print(x.shape)
+        return x
+
 class Classifier(nn.Module):
     def __init__(self, args):
         super().__init__()
@@ -18,11 +28,11 @@ class Classifier(nn.Module):
         self.n_class = args.n_class
 
         self.layers = nn.Sequential(
-            nn.BatchNorm1d(self.input_dim, affine=False),
-            nn.Linear(self.input_dim, self.n_units),
+            nn.BatchNorm1d(124, affine=False),  # added!
+            nn.Linear(124, self.n_units),
+            nn.BatchNorm1d(self.n_units, affine=False),
             nn.ReLU(),
             nn.Dropout(self.dropout),
-            nn.BatchNorm1d(self.n_units, affine=False),
             nn.Linear(self.n_units, self.n_class),
             nn.Softmax(dim=-1)
         )

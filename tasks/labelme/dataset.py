@@ -37,15 +37,15 @@ class Dataset(data.Dataset):
 
         self.labels = np.loadtxt(self.root_dir / 'labels.txt', dtype=np.float32)
         with open(self.root_dir / 'filenames.txt', 'r') as f:
-            self.image_paths = f.read().splitlines()
+            self.image_names = f.read().splitlines()
         if self.is_train:
             self.annotations = np.loadtxt(self.root_dir / 'annotations.txt', dtype=np.int64)
 
     def __len__(self):
-        return len(self.image_paths)
+        return len(self.image_names)
 
     def __getitem__(self, idx):
-        x = Image.open(self.image_dir / self.image_paths[idx])
+        x = Image.open(self.image_dir / self.image_names[idx])
         x = self.transforms(x)
         y = self.labels[idx]
 

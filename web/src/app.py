@@ -1,6 +1,12 @@
+import threading
+import zipfile
+
 from flask import Flask, request
 from flask_cors import CORS
 import os
+
+import train
+from train import Train
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
@@ -28,31 +34,39 @@ def upload_file():
         # 打印日志到文件
         with open('app.log', 'a') as f:
             f.write('上传文件：%s\n' % filename)
-        return {'msg': '上传成功'}
+        # # 判断文件是否为.zip文件
+        # if not zipfile.is_zipfile(save_path):
+        #     return {'code': 400, 'msg': '文件不是zip压缩文件格式', 'data': None}
+
+        # 解压缩文件并列出各级文件
+        with zipfile.ZipFile(save_path, 'r') as zip_file:
+            file_list = zip_file.namelist()
+            return {'code': 200, 'msg': '上传成功', 'data': file_list}
 
 
-@app.route('/start', methods='get')
+trainInstance = None
+
+
+@app.route('/start', methods=["POST"])
+def startTask():
+    task = request.args.get('type', type=str)
+    if task not in ['music', 'labelme']:
+        return {'code': 400, 'msg': 'type error', 'data': None}
+    global trainInstance
+    trainInstance = Train(task)
+    t = threading.Thread(trainInstance.train())
+    t.start()
+    return {'code': 200, 'msg': 'task begin', 'data': None}
+
+
+@app.route('/getProgress', methods=["GET"])
 def getProgress():
-    t = request.args.get('type', type=str)
-    # unzip the file
 
-    if t == "music":
-        # start music
-        pass
-    else:
-        # start pic
-        pass
-
-
-@app.route('/progress', methods='get')
-def getProgress():
-    t = request.args.get('type', type=str)
-    if t == "music":
-        from . import g_progress
-        return g_progress
-    else:
-        from . import g_progress
-        return g_progress
+    global trainInstance
+    if type(trainInstance) == train.Train:
+        i = train.Train(trainInstance).getProgress()
+        return {'code': 200, 'msg': 'task progress', 'data': i}
+    return {'code': 400, 'msg': 'get progress error', 'data': None}
 
 
 if __name__ == '__main__':

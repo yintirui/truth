@@ -2,6 +2,7 @@ import json
 
 import os
 import torch
+import copy
 import argparse
 import importlib
 import numpy as np
@@ -23,7 +24,7 @@ class Train:
     def __init__(self, ):
 
         print('Loading configurations...')
-
+        self.status = False
         config_file = root_dir / 'conf/music.json'
         print(__file__)
         with open(config_file, 'r') as f:
@@ -38,6 +39,7 @@ class Train:
         #
         # task_name = task_parser.parse_known_args()[0].task
         self.current_epoch = 0
+        self.pLog = []
 
         self.task_module = importlib.import_module(f'tasks.{self.args.task}')
         self.task_dataset = getattr(self.task_module, 'Dataset')
@@ -64,9 +66,12 @@ class Train:
         self.valid_loader = DataLoader(dataset=self.valid_dataset, batch_size=self.args.batch_size)
 
     def getProgress(self):
-        return self.current_epoch / self.args.epochs
+        log = copy.deepcopy(self.pLog)
+        self.pLog.clear()
+        return self.status, self.current_epoch, self.args.epochs, log
 
     def train(self, ):
+        self.status = True
         args = self.args
         print('Building model...')
         classifier = getattr(self.task_module, 'Classifier')(args)
@@ -135,6 +140,12 @@ class Train:
                     pred = torch.argmax(pred, dim=1)
                     valid_correct += torch.sum(torch.eq(pred, y)).item()
 
+            self.pLog.append(
+                f'Epoch: {(epoch + 1):4d} | '
+                f'Train Loss: {train_loss:.3f} | '
+                f'Train Accuracy: {(train_correct / len(self.train_dataset)):.2f} | '
+                f'Valid Accuracy: {(valid_correct / len(self.valid_dataset)):.2f}'
+            )
             print(
                 f'Epoch: {(epoch + 1):4d} | '
                 f'Train Loss: {train_loss:.3f} | '
@@ -162,6 +173,7 @@ class Train:
                 with open(checkpoint_dir / 'args.json', 'w') as f:
                     json.dump(args.__dict__, f, indent=2)
 
+        self.status = False
 
 if __name__ == "__main__":
     t = Train('music')

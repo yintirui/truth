@@ -60,11 +60,12 @@ def startTask():
 
 @app.route('/getProgress', methods=["GET"])
 def getProgress():
-
     global trainInstance
     if type(trainInstance) == train.Train:
-        i = train.Train(trainInstance).getProgress()
-        return {'code': 200, 'msg': 'task progress', 'data': i}
+        s, c, a, ll = trainInstance.getProgress()
+        print(s, c, a, ll)
+        if s:
+            return {'code': 200, 'msg': 'task progress', 'data': {'current': c, 'epochs': a, 'logs': ll}}
     return {'code': 400, 'msg': 'get progress error', 'data': None}
 
 

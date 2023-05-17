@@ -1,6 +1,6 @@
 {
   "seed": 7777,
-  "epochs": 38,
+  "epochs": 88,
   "batch_size": 128,
   "lr": 0.001,
   "log_interval": 1,

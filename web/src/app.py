@@ -47,15 +47,14 @@ def upload_file():
 trainInstance = None
 
 
-@app.route('/start', methods=["POST"])
+@app.route('/start', methods=["GET"])
 def startTask():
     task = request.args.get('type', type=str)
     if task not in ['music', 'labelme']:
         return {'code': 400, 'msg': 'type error', 'data': None}
     global trainInstance
-    trainInstance = Train(task)
-    t = threading.Thread(trainInstance.train())
-    t.start()
+    trainInstance = Train()
+    threading.Thread(target=trainInstance.train).start()
     return {'code': 200, 'msg': 'task begin', 'data': None}
 
 
@@ -70,4 +69,5 @@ def getProgress():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(processes=True)
+    # app.run(threaded=True)

@@ -3,6 +3,7 @@
 # log
 *.log*
 logs/*
+web/src/logs
 
 # data
 data/*

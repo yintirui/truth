@@ -1,5 +1,6 @@
 import json
 
+import os
 import torch
 import argparse
 import importlib
@@ -15,14 +16,16 @@ from torch.utils.tensorboard import SummaryWriter
 from model import CoNAL
 from arguments import get_task_parser, add_train_args, add_model_args
 
+root_dir = Path(os.path.dirname(__file__))
+
 
 class Train:
-    def __init__(self, task_name):
+    def __init__(self, ):
 
         print('Loading configurations...')
-        conf_dir = Path('conf')
-        config_file = conf_dir / 'music.json'
 
+        config_file = root_dir / 'conf/music.json'
+        print(__file__)
         with open(config_file, 'r') as f:
             config = json.load(f)
             self.args = munchify(config)
@@ -53,11 +56,11 @@ class Train:
 
         # unzip compressed file
         print('Loading train dataset...')
-        self.train_dataset = self.task_dataset(self.args, self.args.train_data, is_train=True)
+        self.train_dataset = self.task_dataset(self.args, root_dir / self.args.train_data, is_train=True)
         self.train_loader = DataLoader(dataset=self.train_dataset, batch_size=self.args.batch_size, shuffle=True)
 
         print('Loading validation dataset...')
-        self.valid_dataset = self.task_dataset(self.args, self.args.valid_data)
+        self.valid_dataset = self.task_dataset(self.args, root_dir / self.args.valid_data)
         self.valid_loader = DataLoader(dataset=self.valid_dataset, batch_size=self.args.batch_size)
 
     def getProgress(self):
